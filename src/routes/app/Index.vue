@@ -63,11 +63,11 @@
     >
       <template slot="left">
         <a href="https://vue-crud.github.io/" target="_blank" style="color:white;text-decoration:none;">
-          <v-icon color="white">help</v-icon>  vue-crud.github.io
+          UNIPAMPA
         </a>
       </template>
       <template slot="center">
-        Your Company
+        Redes de Computadores - Pesquisa em CPF e CNPJ
       </template>
       <template slot="right">
         &#9400; {{ year }}

@@ -2,9 +2,23 @@ const mutations = {
   login (state, data) {
     state.logged = 1
     state.loginFailed = false
-    const { token } = data
-    const user = JSON.stringify(data.user)
-    const permissions = JSON.stringify(data.permissions)
+    const token = data.token || data.access_token
+    // const user = JSON.stringify(data.user)
+    // const permissions = JSON.stringify(data.permissions)
+    const user = JSON.stringify({
+      name: (data.user && data.user.name) ? data.user.name : 'John Doe',
+      email: (data.user && data.user.email) ? data.user.email : 'john.doe@example.com',
+    })
+
+    const permissions = JSON.stringify(
+      Array.isArray(data.permissions)
+        ? data.permissions
+        : [
+          'user_permissions',
+          'admin_permissions',
+          'settings',
+        ]
+    )
 
     localStorage.setItem('token', token)
     localStorage.setItem('user', user)

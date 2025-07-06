@@ -1,5 +1,5 @@
 export default {
-  title: 'Busca CPF e CNPJ',
+  title: 'Buscador',
   locales: [
     {
       name: 'en',

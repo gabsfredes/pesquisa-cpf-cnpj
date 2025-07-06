@@ -27,6 +27,7 @@ const actions = {
       Vue.http.post(getUrl(path), credential)
         .then(response => response.json())
         .then((result) => {
+          console.log('Resultado do login:', result)
           commit('login', result)
           resolve()
         })
