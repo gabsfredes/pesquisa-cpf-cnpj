@@ -20,9 +20,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(valor, chave) in result" :key="chave">
-            <td>{{ chave }}</td>
-            <td>{{ valor }}</td>
+          <tr v-for="(valor, chave) in result.results?.[0] || {}" :key="chave">
+            <td>{{ camposBonitos[chave] || chave }}</td>
+            <td>{{ formatarValor(chave, valor) }}</td>
           </tr>
         </tbody>
       </table>
@@ -38,6 +38,42 @@ import { useAuthStore } from '../store/auth'
 const value = ref('')
 const result = ref(null)
 const auth = useAuthStore()
+
+const camposBonitos = {
+  nome: "Nome",
+  cpf: "CPF",
+  cnpj: "CNPJ",
+  email: "E-mail",
+  telefone: "Telefone",
+  nasc: "Data de Nascimento",
+  endereco: "Endereço",
+  sexo: "Sexo",
+  erro: "Erro",
+  empresas_associadas: "Empresas Associadas"
+}
+
+function formatarValor(chave, valor) {
+  if (!valor) return ''
+
+  if (chave === 'cpf') {
+    return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4')
+  }
+
+  if (chave === 'cnpj') {
+    return valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
+  }
+
+  if (chave.includes('nasc') && valor.length >= 10) {
+    const data = new Date(valor)
+    return data.toLocaleDateString('pt-BR')
+  }
+
+  if (Array.isArray(valor)) {
+    return valor.length === 0 ? 'Nenhuma' : valor.join(', ')
+  }
+
+  return valor
+}
 
 function isValidCPF(cpf) {
   cpf = cpf.replace(/[^\d]+/g, '')
