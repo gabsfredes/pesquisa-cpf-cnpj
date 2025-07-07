@@ -1,32 +1,58 @@
 <template>
   <form class="search-form" @submit.prevent="search">
-    <label for="busca">Digite o CPF ou CNPJ:</label>
+    <label for="busca">Busca por CPF ou CNPJ:</label>
     <div class="input-row">
-      <input
-        id="busca"
-        v-model="value"
-        placeholder="000.000.000-00 ou 00.000.000/0000-00"
-      />
-      <button type="submit">Pesquisar</button>
+      <input id="busca" v-model="value" placeholder="000.000.000-00 ou 00.000.000/0000-00" />
+      <button type="submit" :disabled="loading">
+        {{ loading ? 'Buscando...' : 'Pesquisar' }}
+      </button>
     </div>
 
-    <div v-if="result" class="search-result">
-      <h3>Resultado:</h3>
+    <p v-if="loading" class="loading-msg">Carregando dados...</p>
+    <p v-if="result?.erro" class="error-msg">{{ result.erro }}</p>
+
+    <div v-if="result?.results?.length" class="search-result">
+      <h3>Resultados:</h3>
       <table>
         <thead>
           <tr>
-            <th>Campo</th>
-            <th>Valor</th>
+            <th>CPF / CNPJ</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(valor, chave) in result.results?.[0] || {}" :key="chave">
-            <td>{{ camposBonitos[chave] || chave }}</td>
-            <td>{{ formatarValor(chave, valor) }}</td>
+          <tr v-for="(item, index) in result.results" :key="index">
+            <td>{{ item.cpf || item.cnpj }}</td>
+            <td>
+              <button @click="detalheSelecionado = item">Ver Detalhes</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Modal ou Seção Detalhes -->
+    <div v-if="detalheSelecionado" class="detalhe-card">
+      <h4>Detalhes</h4>
+      <div v-for="(valor, chave) in detalheSelecionado" :key="chave" class="result-card">
+        <div class="campo">{{ camposBonitos[chave] || chave }}</div>
+        <div class="valor">
+          <template v-if="chave === 'empresas_associadas' && Array.isArray(valor)">
+            <div class="empresa-card" v-for="(empresa, idx) in valor" :key="idx">
+              <div v-for="(v, k) in empresa" :key="k">
+                <strong>{{ camposBonitos[k] || k }}:</strong> {{ formatarValor(k, v) }}
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            {{ formatarValor(chave, valor) }}
+          </template>
+        </div>
+
+      </div>
+      <button @click="detalheSelecionado = null" class="fechar">Fechar</button>
+    </div>
+
   </form>
 </template>
 
@@ -38,6 +64,8 @@ import { useAuthStore } from '../store/auth'
 const value = ref('')
 const result = ref(null)
 const auth = useAuthStore()
+const loading = ref(false)
+const detalheSelecionado = ref(null)
 
 const camposBonitos = {
   nome: "Nome",
@@ -68,12 +96,18 @@ function formatarValor(chave, valor) {
     return data.toLocaleDateString('pt-BR')
   }
 
+  // Empresas associadas — exibir como array de cartões
+  if (chave === 'empresas_associadas' && Array.isArray(valor)) {
+    return valor
+  }
+
   if (Array.isArray(valor)) {
     return valor.length === 0 ? 'Nenhuma' : valor.join(', ')
   }
 
   return valor
 }
+
 
 function isValidCPF(cpf) {
   cpf = cpf.replace(/[^\d]+/g, '')
@@ -119,6 +153,8 @@ const search = async () => {
   const isCPF = clean.length === 11
   const isCNPJ = clean.length === 14
 
+  result.value = null
+
   if (!isCPF && !isCNPJ) {
     result.value = { erro: 'Informe um CPF ou CNPJ com 11 ou 14 dígitos.' }
     return
@@ -135,7 +171,7 @@ const search = async () => {
   }
 
   try {
-    result.value = null
+    loading.value = true
     const endpoint = isCPF
       ? `http://26.124.13.39:5000/search_CPFdb?cpf=${clean}`
       : `http://26.124.13.39:5000/search_CNPJdb?cnpj=${clean}`
@@ -148,6 +184,8 @@ const search = async () => {
     result.value = res.data
   } catch (err) {
     result.value = { erro: 'Erro ao consultar o CPF/CNPJ.' }
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -199,37 +237,104 @@ const search = async () => {
   background: #0056b3;
 }
 
-.search-result {
-  width: 100%;
-  overflow-x: auto;
+.loading-msg {
+  font-style: italic;
+  color: #555;
+  font-size: 0.95rem;
 }
 
-.search-result h3 {
-  margin-bottom: 0.5rem;
+.error-msg {
+  color: red;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.search-result {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.result-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f9f9f9;
+}
+
+.result-card .campo {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.result-card .valor {
+  font-size: 0.98rem;
+  color: #555;
+  word-wrap: break-word;
 }
 
 .search-result table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1rem;
   font-size: 0.95rem;
-  background: #fff;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .search-result th,
 .search-result td {
   padding: 12px;
+  border: 1px solid #ddd;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
 
 .search-result th {
-  background-color: #f5f5f5;
+  background: #f2f2f2;
   font-weight: bold;
-  color: #333;
 }
 
-.search-result tr:hover {
-  background-color: #f1f1f1;
+.search-result button {
+  background-color: #007bff;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-result button:hover {
+  background-color: #0056b3;
+}
+
+.detalhe-card {
+  margin-top: 2rem;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.fechar {
+  margin-top: 1rem;
+  background: #999;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.fechar:hover {
+  background: #666;
+}
+
+.empresa-card {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
 }
 </style>

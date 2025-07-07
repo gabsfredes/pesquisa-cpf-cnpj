@@ -5,7 +5,10 @@
       <h2>Acesso ao Sistema</h2>
       <input v-model="username" type="text" placeholder="Usuário" required />
       <input v-model="password" type="password" placeholder="Senha" required />
-      <button type="submit">Entrar</button>
+      <button type="submit" :disabled="loading">
+        {{ loading ? 'Carregando...' : 'Entrar' }}
+      </button>
+
       <p v-if="error" class="error-msg">Usuário ou senha inválidos</p>
     </form>
   </div>
@@ -16,6 +19,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth'
 
+const loading = ref(false)
 const router = useRouter()
 const auth = useAuthStore()
 const username = ref('')
@@ -24,11 +28,14 @@ const error = ref(false)
 
 const doLogin = async () => {
   try {
+    loading.value = true
     error.value = false
     await auth.login({ username: username.value, password: password.value })
     router.push('/')
   } catch (err) {
     error.value = true
+  } finally {
+    loading.value = false
   }
 }
 </script>
