@@ -1,8 +1,15 @@
 <template>
   <form class="search-form" @submit.prevent>
-    <label for="busca">Busca por CPF ou CNPJ:</label>
+    <div class="search-helpers">
+      <label for="busca">Busca por nome de pessoa física ou CPF ou CNPJ.</label>
+        <span class="info">
+          Você pode buscar por CPF, CNPJ ou nome de pessoa física. Não é necessário informar caracteres especiais nem
+          nome completo.
+        </span>
+    </div>
+
     <div class="input-row">
-      <input id="busca" v-model="value" placeholder="000.000.000-00 ou 00.000.000/0000-00" />
+      <input id="busca" v-model="value" placeholder="Informe aqui a sua busca" />
       <button type="submit" :disabled="loading" @click="novaBusca">
         {{ loading ? 'Buscando...' : 'Pesquisar' }}
       </button>

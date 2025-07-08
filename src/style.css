@@ -316,3 +316,11 @@ button:focus-visible {
   margin: 0.5rem 0;
   border-radius: 6px;
 }
+
+.search-helpers {
+  text-align: left;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5px;
+}
