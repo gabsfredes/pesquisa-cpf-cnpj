@@ -2,12 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../pages/Login.vue'
 import Home from '../pages/Home.vue'
 import Config from '../pages/Config.vue'
+import Register from '../pages/Register.vue'
 import { useAuthStore } from '../store/auth'
 import { useConfigStore } from '../store/config'
 
 const routes = [
   { path: '/config', component: Config },
   { path: '/login', component: Login },
+  { path: '/register', component: Register },
   { path: '/', component: Home, meta: { requiresAuth: true } },
   {
     path: '/',

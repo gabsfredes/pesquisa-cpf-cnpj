@@ -12,6 +12,7 @@
       </button>
 
       <p v-if="error" class="error-msg">Usuário ou senha inválidos</p>
+      <router-link to="/register">Não possui conta? Registrar</router-link>
     </form>
   </div>
 </template>
@@ -41,3 +42,11 @@ const doLogin = async () => {
   }
 }
 </script>
+<style scoped>
+a {
+  display: block;
+  text-align: center;
+  color: #007bff;
+  margin-top:0.2rem;
+}
+</style>
