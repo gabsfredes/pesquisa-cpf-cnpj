@@ -8,7 +8,7 @@
     </header>
 
     <main class="home-main">
-      <SearchForm />
+      <Buscas />
     </main>
 
     <footer class="home-footer">
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import SearchForm from '../components/SearchForm.vue'
+import Buscas from '../components/Buscas.vue'
 import { useAuthStore } from '../store/auth'
 
 const auth = useAuthStore()

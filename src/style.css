@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color-scheme: light;
-  color: rgba(255, 255, 255, 0.87);
+  color: #777;
   background-color: #242424;
 
   font-synthesis: none;
@@ -168,4 +168,151 @@ button:focus-visible {
   color: #888;
   font-size: 0.9rem;
   margin-top: 1rem;
+}
+/* Página de Pesquisa */
+.search-form {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+  width: 90%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-form label {
+  font-weight: bold;
+  color: #333;
+}
+
+.input-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.input-row button {
+  background: #007bff;
+  color: white;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.input-row button:hover {
+  background: #0056b3;
+}
+
+.loading-msg {
+  font-style: italic;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.error-msg {
+  color: red;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.search-result {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.result-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f9f9f9;
+}
+
+.result-card .campo {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.result-card .valor {
+  font-size: 0.98rem;
+  color: #555;
+  word-wrap: break-word;
+}
+
+.search-result table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.search-result th,
+.search-result td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.search-result th {
+  background: #f2f2f2;
+  font-weight: bold;
+}
+
+.search-result button {
+  background-color: #007bff;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-result button:hover {
+  background-color: #0056b3;
+}
+
+.detalhe-card {
+  margin-top: 2rem;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.fechar {
+  margin-top: 1rem;
+  background: #999;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.fechar:hover {
+  background: #666;
+}
+
+.empresa-card {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
 }
