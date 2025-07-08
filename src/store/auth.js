@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useConfigStore } from './config'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -8,7 +9,12 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async login(credentials) {
-      const res = await axios.post('http://26.124.13.39:5000/login', credentials)
+      const config = useConfigStore()
+      if (!config.configurado) {
+        throw new Error('IP e porta não configurados.')
+      }
+
+      const res = await axios.post(`${config.baseURL}/login`, credentials)
       this.token = res.data.access_token
       this.username = credentials.username
       localStorage.setItem('token', this.token)
@@ -19,7 +25,8 @@ export const useAuthStore = defineStore('auth', {
       this.username = null
       localStorage.removeItem('token')
       localStorage.removeItem('username')
+      localStorage.removeItem('ip')
+      localStorage.removeItem('porta')
     },
   },
 })
-

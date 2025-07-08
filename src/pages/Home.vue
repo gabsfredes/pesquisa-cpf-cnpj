@@ -33,6 +33,7 @@ const logout = () => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 100%;
   background-color: #f7f9fb;
   font-family: 'Roboto', sans-serif;
 }
