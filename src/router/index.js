@@ -10,7 +10,6 @@ const routes = [
   { path: '/config', component: Config },
   { path: '/login', component: Login },
   { path: '/register', component: Register },
-  { path: '/', component: Home, meta: { requiresAuth: true } },
   {
     path: '/',
     component: Home,
