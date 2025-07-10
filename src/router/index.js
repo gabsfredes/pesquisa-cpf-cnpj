@@ -22,7 +22,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => { 
   const auth = useAuthStore()
   const config = useConfigStore()
 
@@ -30,8 +30,16 @@ router.beforeEach((to, from, next) => {
     return next('/config')
   }
 
+  if (auth.token && to.meta.requiresAuth) {
+    const isValid = await auth.validateToken();
+    if (!isValid) {
+      auth.logout(); 
+      return next('/config'); 
+    }
+  }
+
   if (to.meta.requiresAuth && !auth.token) {
-    return next('/login')
+    return next('/config')
   }
 
   return next()

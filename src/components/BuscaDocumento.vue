@@ -1,6 +1,6 @@
 <template>
     <div class="search-form">
-        <h2>Busca por pessoa física, CPF ou CNPJ.</h2>
+        <h2>Busca por nome, CPF ou CNPJ</h2>
         <form @submit.prevent="buscarDocumento">
             <div class="input-row">
                 <input v-model="documento" placeholder="Digite aqui..." required />
@@ -17,14 +17,18 @@
             <table>
                 <thead>
                     <tr>
-                        <th>CPF</th>
+                        <th>Resultado</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="(item, index) in resultados" :key="index">
                         <tr>
-                            <td>{{ item.cnpj_buscado || item.cpf }}</td>
+                            <td>
+                                <span v-if="lastSearchType === 'cpf'">{{ item.cpf }}</span>
+                                <span v-else-if="lastSearchType === 'cnpj'">{{ item.cnpj_buscado }}</span>
+                                <span v-else-if="lastSearchType === 'nome'">{{ item.nome }}</span>
+                            </td>
                             <td>
                                 <button @click="toggleDetalhes(index)">
                                     {{ item.exibirDetalhes ? 'Ocultar' : 'Ver detalhes' }}
@@ -124,11 +128,13 @@
 import { ref } from 'vue'
 import { buscarCPF } from '../services/BuscaCPF'
 import { buscarCNPJ } from '../services/BuscaCNPJ'
+import { buscarNome } from '../services/BuscaNome'
 
 const documento = ref('')
 const resultados = ref([])
 const erro = ref(null)
 const loading = ref(false)
+const lastSearchType = ref(null)
 
 const buscarDocumento = async () => {
     erro.value = null
@@ -136,15 +142,27 @@ const buscarDocumento = async () => {
     loading.value = true
 
     const doc = documento.value.replace(/\D/g, '')
+    const originalInput = documento.value.trim()
 
     try {
         let data
         if (doc.length === 11) {
             data = await buscarCPF(doc)
+            lastSearchType.value = 'cpf'
         } else if (doc.length === 14) {
             data = await buscarCNPJ(doc)
+            lastSearchType.value = 'cnpj'
+        } else if (originalInput.length > 0) {
+            // Verifica se é nome (só letras e espaços)
+            if (/^[A-Za-zÀ-ÿ\s]+$/.test(originalInput)) {
+                data = await buscarNome(originalInput)
+                lastSearchType.value = 'nome'
+            } else {
+                erro.value = 'Digite um nome válido (apenas letras e espaços) ou um CPF/CNPJ válido.'
+                return
+            }
         } else {
-            erro.value = 'Documento inválido. Use um CPF ou CNPJ válido.'
+            erro.value = 'Documento inválido. Use um CPF, CNPJ ou nome válido.'
             return
         }
 
