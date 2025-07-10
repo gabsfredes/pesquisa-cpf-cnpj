@@ -36,3 +36,27 @@ export function isValidCNPJ(cnpj) {
   dg2 = dg2 < 2 ? 0 : 11 - dg2
   return dg2 === d2
 }
+
+export function isPotentiallyMalicious(input) {
+  if (typeof input !== 'string') {
+    return false;
+  }
+  const lowerInput = input.toLowerCase();
+
+  const sqlInjectionPatterns = new RegExp([
+    // Operadores SQL comuns
+    '\\b(?:select|insert|update|delete|drop|truncate|alter|create|union|exec|execute)\\b',
+    // Comentários SQL e separadores de query
+    '--|;|/\\*|\\*/',
+    // Operadores lógicos
+    '\\b(?:or|and)\\b\\s+\\d+=\\d+', // Ex: OR 1=1
+    // Aspas e backticks escapados
+    "['\"`]",
+    // Keywords para bypass de login
+    '\\b(?:admin|password)\\b',
+    // Potenciais calls de sistema
+    '\\b(?:xp_cmdshell|xp_regread)\\b' // Exemplo para SQL Server
+  ].join('|'), 'i'); // 'i' para case-insensitive
+
+  return sqlInjectionPatterns.test(lowerInput);
+}

@@ -129,7 +129,7 @@ import { ref } from 'vue'
 import { buscarCPF } from '../services/BuscaCPF'
 import { buscarCNPJ } from '../services/BuscaCNPJ'
 import { buscarNome } from '../services/BuscaNome'
-import { isValidCPF, isValidCNPJ } from '../utils/validators'
+import { isValidCPF, isValidCNPJ, isPotentiallyMalicious} from '../utils/validators'
 
 const documento = ref('')
 const resultados = ref([])
@@ -144,6 +144,12 @@ const buscarDocumento = async () => {
 
     const doc = documento.value.replace(/\D/g, '')
     const originalInput = documento.value.trim()
+    
+    if (isPotentiallyMalicious(originalInput)) {
+        erro.value = 'Entrada inválida. Caracteres ou padrões suspeitos detectados.';
+        loading.value = false;
+        return;
+    }
 
     try {
         let data
