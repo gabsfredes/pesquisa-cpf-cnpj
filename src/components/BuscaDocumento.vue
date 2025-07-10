@@ -144,7 +144,8 @@ const buscarDocumento = async () => {
 
     const doc = documento.value.replace(/\D/g, '')
     const originalInput = documento.value.trim()
-    
+
+    // Previni injeção SQL ou outros ataques maliciosos
     if (isPotentiallyMalicious(originalInput)) {
         erro.value = 'Entrada inválida. Caracteres ou padrões suspeitos detectados.';
         loading.value = false;
@@ -180,13 +181,12 @@ const buscarDocumento = async () => {
             return
         }
 
-        // Handle cases where the backend returns no results for a valid search
+
         if (data && (Array.isArray(data.results) && data.results.length === 0 || !data.results && !Array.isArray(data))) {
             erro.value = 'Nenhum resultado encontrado para o documento informado.';
             return;
         }
 
-        // Se for resultado de CPF
         if (data.results) {
             resultados.value = data.results.map(item => ({
                 ...item,
