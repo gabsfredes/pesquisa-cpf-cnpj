@@ -43,7 +43,7 @@
                                     <div v-if="item.cnpj_buscado">
                                         <p><strong>Razão Social:</strong> {{ item.razao_social }}</p>
                                         <p><strong>Capital Social:</strong> R$ {{ item.capital_social.toLocaleString()
-                                        }}</p>
+                                            }}</p>
                                         <p><strong>Natureza Jurídica:</strong> {{ item.natureza_juridica }}</p>
                                         <p><strong>Porte da Empresa:</strong> {{ item.porte_empresa }}</p>
 
@@ -104,7 +104,7 @@
                                                         <p><strong>Natureza Jurídica:</strong> {{
                                                             empresa.natureza_juridica }}</p>
                                                         <p><strong>Qualificação:</strong> {{ empresa.qualificacao_socio
-                                                        }}</p>
+                                                            }}</p>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -129,6 +129,7 @@ import { ref } from 'vue'
 import { buscarCPF } from '../services/BuscaCPF'
 import { buscarCNPJ } from '../services/BuscaCNPJ'
 import { buscarNome } from '../services/BuscaNome'
+import { isValidCPF, isValidCNPJ } from '../utils/validators'
 
 const documento = ref('')
 const resultados = ref([])
@@ -147,23 +148,36 @@ const buscarDocumento = async () => {
     try {
         let data
         if (doc.length === 11) {
+            if (!isValidCPF(doc)) { 
+                erro.value = 'CPF inválido. Por favor, verifique os dígitos e tente novamente.';
+                return; 
+            }
             data = await buscarCPF(doc)
             lastSearchType.value = 'cpf'
         } else if (doc.length === 14) {
+            if (!isValidCNPJ(doc)) { 
+                erro.value = 'CNPJ inválido. Por favor, verifique os dígitos e tente novamente.';
+                return;
+            }
             data = await buscarCNPJ(doc)
             lastSearchType.value = 'cnpj'
         } else if (originalInput.length > 0) {
-            // Verifica se é nome (só letras e espaços)
-            if (/^[A-Za-zÀ-ÿ\s]+$/.test(originalInput)) {
+            if (/^[A-Za-zÀ-ÿ\s%]+$/.test(originalInput)) {
                 data = await buscarNome(originalInput)
                 lastSearchType.value = 'nome'
             } else {
-                erro.value = 'Digite um nome válido (apenas letras e espaços) ou um CPF/CNPJ válido.'
+                erro.value = 'Digite um nome válido (apenas letras, espaços ou %) ou um CPF/CNPJ válido.'
                 return
             }
         } else {
             erro.value = 'Documento inválido. Use um CPF, CNPJ ou nome válido.'
             return
+        }
+
+        // Handle cases where the backend returns no results for a valid search
+        if (data && (Array.isArray(data.results) && data.results.length === 0 || !data.results && !Array.isArray(data))) {
+            erro.value = 'Nenhum resultado encontrado para o documento informado.';
+            return;
         }
 
         // Se for resultado de CPF
