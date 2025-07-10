@@ -411,7 +411,7 @@ def run_flask_server(port, CPFdb_path, CNPJdb_path):
 
     try:
         print(f"Iniciando servidor com Waitress em http://0.0.0.0:{port}")
-        serve(app, host="26.124.13.39", port=port, threads=8)
+        serve(app, host="0.0.0.0", port=port, threads=8)
     except Exception as e:
         print(f"Erro ao iniciar o servidor Flask: {e}")
 
